@@ -1,24 +1,23 @@
-def split_bags(weights):
-    total_weight = sum(weights)
+def bellman_ford(n, edges):
+    INF = float('inf')
+    dist = [INF] * n
+    dist[0] = 0  # Começamos do nó 0
     
-    # Se a soma total for ímpar, não pode ser dividida igualmente
-    if total_weight % 2 != 0:
-        return "NO"
-    
-    target = total_weight // 2
-    
-    # Programação dinâmica para verificar se é possível formar a soma target
-    dp = [False] * (target + 1)
-    dp[0] = True  # Soma 0 sempre é possível
-    
-    for weight in weights:
-        for j in range(target, weight - 1, -1):
-            dp[j] |= dp[j - weight]
-    
-    return "YES" if dp[target] else "NO"
+    # Relaxa as arestas n-1 vezes
+    for _ in range(n - 1):
+        for x, y, t in edges:
+            if dist[x] != INF and dist[x] + t < dist[y]:
+                dist[y] = dist[x] + t
 
-# Leitura da entrada
-m = int(input())  # Número de casos de teste
-for _ in range(m):
-    weights = list(map(int, input().split()))
-    print(split_bags(weights))
+    # Verifica se tem ciclos negativos
+    for x, y, t in edges:
+        if dist[x] != INF and dist[x] + t < dist[y]:
+            return "possible"  # Tem um ciclo negativo
+
+    return "not possible"
+
+cases = int(input().strip())
+for _ in range(cases):
+    n, m = map(int, input().split())
+    edges = [tuple(map(int, input().split())) for _ in range(m)]
+    print(bellman_ford(n, edges))
